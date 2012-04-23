@@ -55,9 +55,6 @@ def parse_json(data, default_name='data'):
 
     return (name, chunk)
 
-
-#print discover({'a': 'b', 'c': {'d': {'e': 'f'}}}, 'lofasz')
-
 def readlines(infile, outfile=None):
     l = infile.readline()
     while l:
