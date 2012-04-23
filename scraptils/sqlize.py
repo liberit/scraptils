@@ -64,7 +64,7 @@ def readlines(infile, outfile=None):
         try:
             l = infile.readline()
         except Exception, e:
-            print '[E] Error reading %s: %r' % (infile.filename, e.message)
+            print '[E] Error reading %s: %r' % (infile.name, e.message)
             l = None
 
 def createschema(struct, metadata):
