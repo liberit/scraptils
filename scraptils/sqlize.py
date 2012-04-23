@@ -19,7 +19,7 @@ def discover(table, data, schema=None):
 
     for key, value in data.items():
         if isinstance(value, dict):
-            sub = discover(value, key)
+            sub = discover(key, value)
             if sub:
                 schema.update(sub)
                 schema[table]['_m2o'].append(sub.keys()[0])
@@ -64,7 +64,11 @@ def readlines(infile, outfile=None):
         if outfile:
             outfile.write(l)
         yield l
-        l = infile.readline()
+        try:
+            l = infile.readline()
+        except Exception, e:
+            print '[E] Error reading %s: %r' % (infile.filename, e.message)
+            l = None
 
 def createschema(struct, metadata):
     for table_name, fields in struct.items():
