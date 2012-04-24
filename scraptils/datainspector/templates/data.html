@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block header %}
+<h1 class="right">{{ db }}</h1>
+{% endblock %}
+{% block main %}
+<table>
+    <tr class="alt">
+        <th>#</th>
+        {% for th in cols %}
+        <th>{{ th }}</th>
+        {% endfor %}
+    </tr>
+    {% for row in data %}
+    <tr class="{{ loop.cycle('noalt', 'alt') }}">
+        <td>{{ loop.index }}</td>
+        {% for cell in row %}
+        <td>{{ cell }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

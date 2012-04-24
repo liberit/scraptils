@@ -1,0 +1,16 @@
+body, div, table, tr, td, h1, h2, h3, h4, pre, p, input { padding: 0; margin: 0; font-family: arial,Verdana; }
+
+table { border-spacing: 0; border-collapse: collapse; border: 1px solid #999999; margin: 0px 20px; }
+td, th { font-size: 12px; padding: 4px 8px; border-left: 1px solid #999999; border-right: 1px solid #999999;}
+th { border-bottom: 1px solid #000000; }
+tr:hover td { background: none repeat scroll 0 0 #333333; color: #FFFFFF }
+td:first-child { color: #999999; font-weight: bold; text-align: center; }
+
+#header { position: absolute; left: 0; top: 0; right: 0; height: 60px; line-height: 60px;  background: #333333; color: #FFFFFF; clear: both; }
+#header h1 { margin: 0 10px; }
+#main { margin-top: 70px; }
+
+.alt { background: none repeat scroll 0 0 #F2F2F2; }
+
+.right { float: right; }
+.left { float: left; }
