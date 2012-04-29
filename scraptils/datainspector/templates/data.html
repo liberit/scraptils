@@ -3,6 +3,8 @@
 <h1 class="right">{{ db }}</h1>
 {% endblock %}
 {% block main %}
+<div><a href="/json/{{db}}{{query}}">JSON</a> | <a href="/csv/{{db}}{{query}}">CSV</a></div>
+
 <table>
     <tr class="alt">
         <th>#</th>
