@@ -8,9 +8,15 @@ td:first-child { color: #999999; font-weight: bold; text-align: center; }
 
 #header { position: absolute; left: 0; top: 0; right: 0; height: 60px; line-height: 60px;  background: #333333; color: #FFFFFF; clear: both; }
 #header h1 { margin: 0 10px; }
-#main { margin-top: 70px; }
+#main { margin-top: 110px; }
 
 .alt { background: none repeat scroll 0 0 #F2F2F2; }
 
 .right { float: right; }
 .left { float: left; }
+
+#infobox { position: absolute; left: 0; top: 60px; right: 0; height: 30px; background: none repeat scroll 0 0 #555; color: #FFFFFF; clear: both; text-align: right; padding: 5px; }
+#infobox li { list-style-type:none; display: inline; }
+#infobox ul { display: inline; padding: 0.5em; }
+#infobox a { color: #c2c2c2; }
+#infobox li:after { content: " | "; }

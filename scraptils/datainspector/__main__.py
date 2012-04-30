@@ -4,7 +4,7 @@
 from flask import Flask, request, render_template, redirect, flash, jsonify, Response
 from htsql import HTSQL
 from os import listdir
-import cStringIO, csv, codecs
+import cStringIO, csv, codecs, json
 
 
 DB_DIR = './data'
@@ -17,7 +17,7 @@ def connect(db_string):
     return HTSQL(db_string)
 
 def loadsqlites(path):
-    return dict((db.replace('.sqlite', ''), 'sqlite:%s/%s' % (path, db)) for db in listdir(path) if db.endswith('.sqlite'))
+   return dict((db[:-len('.sqlite')], 'sqlite:%s/%s' % (path, db)) for db in listdir(path) if db.endswith('.sqlite'))
 
 
 @app.route('/', methods=['GET'])
@@ -33,7 +33,22 @@ def query_redirect():
 @app.route('/q/<string:db>/<path:q>', methods=['GET'])
 def do_query(db, q):
     (data, columns, q) = query(request, db, q)
-    return render_template('data.html', data=data, cols=columns, db=db, query=q)
+    global DB_DIR
+    f=open('%s/%s.json' % (DB_DIR, db),'r')
+    meta=json.load(f)
+    f.close()
+    #except: meta=None
+    return render_template('data.html', data=data, cols=columns, db=db, query=q, meta=meta)
+
+@app.route('/datasets', methods=['GET'])
+def datasets():
+    global DB_DIR
+    dbs=[]
+    for db in loadsqlites(DB_DIR).keys():
+        f=open('%s/%s.json' % (DB_DIR, db),'r')
+        dbs.append({'name': db, 'meta': json.load(f)})
+        f.close()
+    return render_template('datasets.html', dbs=dbs)
 
 @app.route('/csv/<string:db>/<path:q>', methods=['GET'])
 def csv_query(db, q):

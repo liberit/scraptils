@@ -3,7 +3,19 @@
 <h1 class="right">{{ db }}</h1>
 {% endblock %}
 {% block main %}
-<div><a href="/json/{{db}}{{query}}">JSON</a> | <a href="/csv/{{db}}{{query}}">CSV</a></div>
+<div id="infobox">
+   {%if meta %}
+   {{meta.title}}, Author: <a href="{{meta.author.url}}">{{meta.author.title}}</a>
+   Download as: 
+   <ul>
+      <li><a href="/json/{{db}}{{query}}">JSON</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)</li>
+      <li><a href="/csv/{{db}}{{query}}">CSV</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)</li>
+      <li><a href="/{{db}}">SQLite</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)</li>
+      <li><a href="{{meta.scraper.source}}">Source code</a> ({{meta.scraper.license}})</li>
+   </ul>
+   <div>{{meta.description}}</div>
+   {% endif %}
+</div>
 
 <table>
     <tr class="alt">

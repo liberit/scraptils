@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block main %}
+Available Datasets
+<ul>
+   {% for db in dbs %}
+   <li><a
+      href="/q/{{db.name}}/{{db.meta.deftable}}.limit(100)">{{db.meta.title}}</a></li>
+   {% endfor %}
+</ul>
+{% endblock %}
