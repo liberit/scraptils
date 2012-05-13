@@ -130,7 +130,20 @@ function filter(item) {
 }
 
 $(function () {
+  var has_id = false;
+  for(k in columns) {
+      if(columns[k].id == 'id') {
+          has_id = true;
+          break;
+      }
+  }
   data = {{ data|safe }};
+  if(!has_id) {
+      columns.push({id: 'id', field: 'id', name: 'id', sortable: true})
+      for(k in data) {
+          data[k].id = k+1;
+      }
+  }
   dataView = new Slick.Data.DataView({ inlineFilters: true });
   grid = new Slick.Grid("#grid", dataView, columns, options);
 
