@@ -30,16 +30,6 @@ def query_redirect():
     q_str = request.form.get('query')
     return redirect('/q/'+q_str)
 
-@app.route('/q/<string:db>/<path:q>', methods=['GET'])
-def do_query(db, q):
-    (data, columns, q) = query(request, db, q)
-    global DB_DIR
-    f=open('%s/%s.json' % (DB_DIR, db),'r')
-    meta=json.load(f)
-    f.close()
-    #except: meta=None
-    return render_template('data.html', data=data, cols=columns, db=db, query=q, meta=meta)
-
 @app.route('/datasets', methods=['GET'])
 def datasets():
     global DB_DIR
@@ -50,6 +40,19 @@ def datasets():
         f.close()
     return render_template('datasets.html', dbs=dbs)
 
+@app.route('/q/<string:db>/<path:q>', methods=['GET'])
+def html_query(db, q):
+    (data, columns, q) = query(request, db, q)
+    global DB_DIR
+    try:
+        f=open('%s/%s.json' % (DB_DIR, db),'r')
+        meta=json.load(f)
+        f.close()
+    except:
+        meta=None
+    columns = json.dumps([{'id': '_'.join(x.split()), 'name': x, 'field': x, 'sortable': True} for x in columns])
+    return render_template('data.html', data=json.dumps([dict(zip(x.__fields__, [y for y in x])) for x in data]), cols=columns, db=db, query=q, meta=meta)
+
 @app.route('/csv/<string:db>/<path:q>', methods=['GET'])
 def csv_query(db, q):
     (data, columns, q) = query(request, db, q)
@@ -58,7 +61,7 @@ def csv_query(db, q):
     writer.writerow(columns)
     writer.writerows(data)
     fd.seek(0)
-    return Response( response=fd.read(), mimetype="text/csv" )
+    return Response(response=fd.read(), mimetype="text/csv")
 
 @app.route('/json/<string:db>/<path:q>', methods=['GET'])
 def json_query(db, q):

@@ -1,36 +1,188 @@
 {% extends "base.html" %}
-{% block header %}
-<h1 class="right">{{ db }}</h1>
+{% block styles %}
+<link rel="stylesheet" href="http://mleibman.github.com/SlickGrid/slick.grid.css" type="text/css"/>
+<link rel="stylesheet" href="http://mleibman.github.com/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css" type="text/css"/>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+body {
+  font: 11px Helvetica, Arial, sans-serif;
+}
+
+:hover > .hidden { visibility: visible; display: inherit; }
+.hidden { visibility: hidden; display: none; }
+
+#infobox { height: 60px; padding: 2px; clear: both; }
+
+#grid {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.slick-headerrow-column {
+  text-overflow: clip;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.slick-headerrow-column input {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #888888;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.odd { background: #F8F8F8; }
+
+</style>
 {% endblock %}
-{% block main %}
+{% block scripts %}
+<script src="http://mleibman.github.com/SlickGrid/lib/jquery-1.7.min.js"></script>
+<script src="http://mleibman.github.com/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js"></script>
+<script src="http://mleibman.github.com/SlickGrid/lib/jquery.event.drag-2.0.min.js"></script>
+<script src="http://mleibman.github.com/SlickGrid/slick.dataview.js"></script>
+<script src="http://mleibman.github.com/SlickGrid/slick.core.js"></script>
+<script src="http://mleibman.github.com/SlickGrid/slick.grid.js"></script>
+{% endblock %}
+{% block body %}
 <div id="infobox">
    {%if meta %}
-   {{meta.title}}, Author: <a href="{{meta.author.url}}">{{meta.author.title}}</a>
-   Download as: 
-   <ul>
-      <li><a href="/json/{{db}}{{query}}">JSON</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)</li>
-      <li><a href="/csv/{{db}}{{query}}">CSV</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)</li>
-      <li><a href="/{{db}}">SQLite</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)</li>
-      <li><a href="{{meta.scraper.source}}">Source code</a> ({{meta.scraper.license}})</li>
-   </ul>
+   <h2>{{meta.title}}</h2>
+   Author: <a href="{{meta.author.url}}">{{meta.author.title}}</a>
+   Download as:
+    <a href="/json/{{db}}{{query}}">JSON</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
+      <a href="/csv/{{db}}{{query}}">CSV</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
+      <a href="/{{db}}">SQLite</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
+      <a href="{{meta.scraper.source}}">Source code</a> ({{meta.scraper.license}})
    <div>{{meta.description}}</div>
    {% endif %}
 </div>
 
-<table>
-    <tr class="alt">
-        <th>#</th>
-        {% for th in cols %}
-        <th>{{ th }}</th>
-        {% endfor %}
-    </tr>
-    {% for row in data %}
-    <tr class="{{ loop.cycle('noalt', 'alt') }}">
-        <td>{{ loop.index }}</td>
-        {% for cell in row %}
-        <td>{{ cell }}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+<div id="grid"></div>
+
+<script>
+window.onpopstate = function(e){
+    if(e.state){
+        console.log(e);
+        //document.getElementById("content").innerHTML = e.state.html;
+        //document.title = e.state.pageTitle;
+    }
+};
+var grid;
+var columnFilters = {};
+var columns = {{ cols|safe }};
+var options = {
+  enableCellNavigation: true,
+  multiColumnSort: true,
+  showHeaderRow: true,
+  enableAddRow: false,
+  defaultColumnWidth: 120
+};
+
+var data = [];
+
+function updateHeaderRow() {
+  for (var i = 0; i < columns.length; i++) {
+    if (columns[i].id !== "selector") {
+      var header = grid.getHeaderRowColumn(columns[i].id);
+      $(header).empty();
+      var input = $("<input type='text'>")
+          .data("columnId", columns[i].id)
+          .val(columnFilters[columns[i].id]);
+      input.appendTo(header);
+    }
+  }
+}
+
+function comparer(a, b) {
+  var x = a[sortcol], y = b[sortcol];
+  return (x == y ? 0 : (x > y ? 1 : -1));
+}
+
+function filter(item) {
+  for (var columnId in columnFilters) {
+    if (columnId !== undefined && columnFilters[columnId] !== "") {
+      var c = grid.getColumns()[grid.getColumnIndex(columnId)];
+      if(!c) continue;
+      var ctype = typeof item[c.field];
+      if(ctype == "string") {
+        if(item[c.field].indexOf(columnFilters[columnId]) == -1) {
+          return false;
+        }
+      } else {
+        if(item[c.field] != columnFilters[columnId]) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+$(function () {
+  data = {{ data|safe }};
+  dataView = new Slick.Data.DataView({ inlineFilters: true });
+  grid = new Slick.Grid("#grid", dataView, columns, options);
+
+  dataView.onRowCountChanged.subscribe(function (e, args) {
+    grid.updateRowCount();
+    grid.render();
+  });
+
+  dataView.onRowsChanged.subscribe(function (e, args) {
+    grid.invalidateRows(args.rows);
+    grid.render();
+  });
+
+  $(grid.getHeaderRow()).delegate(":input", "change keyup", function (e) {
+    columnFilters[$(this).data("columnId")] = $.trim($(this).val());
+    dataView.refresh();
+  });
+
+
+  grid.onColumnsReordered.subscribe(function (e, args) {
+    updateHeaderRow();
+  });
+
+  grid.onColumnsResized.subscribe(function (e, args) {
+    updateHeaderRow();
+  });
+
+  grid.onSort.subscribe(function (e, args) {
+    var cols = args.sortCols;
+    data.sort(function (dataRow1, dataRow2) {
+      for (var i = 0, l = cols.length; i < l; i++) {
+        var field = cols[i].sortCol.field;
+        var sign = cols[i].sortAsc ? 1 : -1;
+        var value1 = dataRow1[field], value2 = dataRow2[field];
+        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+        if (result != 0) {
+          return result;
+        }
+      }
+      return 0;
+    });
+    dataView.refresh();
+    grid.invalidate();
+    grid.render();
+  });
+  // initialize the model after all the events have been hooked up
+  dataView.beginUpdate();
+  dataView.setItems(data);
+  dataView.setFilter(filter);
+  //dataView.setFilterArgs(0);
+  dataView.endUpdate();
+  updateHeaderRow();
+})
+</script>
 {% endblock %}

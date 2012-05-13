@@ -6,13 +6,14 @@
     <meta name="description" content="" />
     <meta name="keywords" content="" />
     <title>LiberitDataInspector {% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" charset="utf-8" />
     {% block scripts %}
     {% endblock %}
     {% block styles %}
+    <link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" charset="utf-8" />
     {% endblock %}
 </head>
 <body>
+{% block body %}
  <div id="header">
   <h1 class="left">LiberitDataInspector</h1>
   {% block header %}
@@ -22,5 +23,6 @@
  {% block main %}
  {% endblock %}
  </div>
+{% endblock %}
 </body>
 </html>
