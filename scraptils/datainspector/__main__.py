@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-from flask import Flask, request, render_template, redirect, flash, jsonify, Response
+from flask import Flask, request, render_template, redirect, flash, jsonify, Response, abort
 from htsql import HTSQL
 from os import listdir
 import cStringIO, csv, codecs, json
@@ -20,17 +20,16 @@ def loadsqlites(path):
    return dict((db[:-len('.sqlite')], 'sqlite:%s/%s' % (path, db)) for db in listdir(path) if db.endswith('.sqlite'))
 
 
-@app.route('/', methods=['GET'])
-def index():
-    return render_template('index.html')
-
+#@app.route('/', methods=['GET'])
+#def index():
+#    return render_template('index.html')
 
 @app.route('/q', methods=['POST'])
 def query_redirect():
     q_str = request.form.get('query')
     return redirect('/q/'+q_str)
 
-@app.route('/datasets', methods=['GET'])
+@app.route('/', methods=['GET'])
 def datasets():
     global DB_DIR
     dbs=[]
@@ -62,6 +61,14 @@ def csv_query(db, q):
     writer.writerows(data)
     fd.seek(0)
     return Response(response=fd.read(), mimetype="text/csv")
+
+@app.route('/sqlite/<string:db>', methods=['GET'])
+def sqlite_download(db):
+    try:
+        f=open('%s/%s.sqlite' % (DB_DIR, db),'r')
+    except:
+        abort(404)
+    return Response(response=f.read(), mimetype="application/sqlite")
 
 @app.route('/json/<string:db>/<path:q>', methods=['GET'])
 def json_query(db, q):
