@@ -20,7 +20,7 @@ body {
 
 #grid {
   position: fixed;
-  top: 60px;
+  top: 120px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -54,7 +54,7 @@ body {
 <script src="http://mleibman.github.com/SlickGrid/slick.core.js"></script>
 <script src="http://mleibman.github.com/SlickGrid/slick.grid.js"></script>
 {% endblock %}
-{% block body %}
+{% block main %}
 <div id="infobox">
    {%if meta %}
    <h2>{{meta.title}}</h2>
@@ -62,7 +62,7 @@ body {
    Download as:
     <a href="/json/{{db}}{{query}}">JSON</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
       <a href="/csv/{{db}}{{query}}">CSV</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
-      <a href="/{{db}}">SQLite</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
+      <a href="/sqlite/{{db}}">SQLite</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
       <a href="{{meta.scraper.source}}">Source code</a> ({{meta.scraper.license}})
    <div>{{meta.description}}</div>
    {% endif %}
