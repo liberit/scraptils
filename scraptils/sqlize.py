@@ -89,10 +89,10 @@ def createschema(struct, metadata):
     for table_name, fields in struct.items():
         columns = [Column(x, y) for x,y in fields.items() if not x.startswith('_')]
         if fields['_m2o']:
-            columns.extend(Column(x+'_id', Integer, ForeignKey('%s.%s_id' % (x, x))) for x in fields['_m2o'])
+            columns.extend(Column(x+'id', Integer, ForeignKey('%s.id' % x)) for x in fields['_m2o'])
         t = Table(table_name
                  ,metadata
-                 ,Column(table_name+'_id', Integer, primary_key=True)
+                 ,Column('id', Integer, primary_key=True)
                  ,*columns
                  )
 
