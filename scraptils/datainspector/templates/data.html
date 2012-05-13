@@ -141,7 +141,7 @@ $(function () {
   if(!has_id) {
       columns.push({id: 'id', field: 'id', name: 'id', sortable: true})
       for(k in data) {
-          data[k].id = k+1;
+          data[k].id = parseInt(k)+1;
       }
   }
   dataView = new Slick.Data.DataView({ inlineFilters: true });
