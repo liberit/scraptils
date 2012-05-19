@@ -3,6 +3,7 @@
 import csv, json, sys
 
 reader = csv.DictReader( sys.stdin)
-headers = reader.next()
+headers = csv.reader( sys.stdin).next()
 reader.fieldnames=headers
-print json.dumps( [ row for row in reader ] )
+for row in reader:
+    print json.dumps(row).replace('\n','')
