@@ -64,6 +64,7 @@ body {
       <a href="/csv/{{db}}{{query}}">CSV</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
       <a href="/sqlite/{{db}}">SQLite</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"{% endif %}>{{meta.license}}</span>)
       <a href="{{meta.scraper.source}}">Source code</a> ({{meta.scraper.license}})
+      <a href="{{meta.source}}">Original Source</a>
    <div>{{meta.description}}</div>
    {% endif %}
 </div>
