@@ -1,3 +1,13 @@
 sqlalchemy
 htsql
 flask
+
+pyPdf
+numpy
+scipy
+matplotlib
+PIL
+nltk
+pbs
+pdfminer
+python-dateutil
