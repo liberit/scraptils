@@ -7,6 +7,7 @@ tr:hover td { background: none repeat scroll 0 0 #333333; color: #FFFFFF }
 td:first-child { color: #999999; font-weight: bold; text-align: center; }
 
 #header { position: absolute; left: 0; top: 0; right: 0; height: 60px; line-height: 60px;  background: #333333; color: #FFFFFF; clear: both; }
+#header h1 a { text-decoration: none; color: #FFF; }
 #header h1 { margin: 0 10px; }
 #main { margin-top: 110px; }
 
