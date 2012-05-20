@@ -4,11 +4,9 @@
 
 from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.pdfdevice import PDFDevice
 from pdfminer.layout import LAParams, LTRect
 from pdfminer.converter import PDFPageAggregator
-from operator import itemgetter
-import sys, csv, cStringIO, codecs, os
+import sys, csv, cStringIO, codecs
 from pbs import pdftotext
 
 class UnicodeWriter:
