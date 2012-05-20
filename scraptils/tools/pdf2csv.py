@@ -4,11 +4,10 @@
 
 from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.pdfdevice import PDFDevice
 from pdfminer.layout import LAParams, LTRect
 from pdfminer.converter import PDFPageAggregator
-from operator import itemgetter
-import sys, csv, cStringIO, codecs, os
+from itertools import islice
+import sys, csv, cStringIO, codecs
 from pbs import pdftotext
 
 class UnicodeWriter:
@@ -95,12 +94,10 @@ def pdf2csv(pdf):
     fp.close()
 
 def filterclose(lst):
-    i=1
     tmp=[lst[0]]
-    while i<len(lst):
-        if lst[i]-2>tmp[-1]:
-            tmp.append(lst[i])
-        i=i+1
+    for elem in islice(lst, 1, None):
+        if elem - 2 > tmp[-1]:
+            tmp.append(elem)
     return tmp
 
 def get_region(pdf, page, x1,y1,x2,y2):
