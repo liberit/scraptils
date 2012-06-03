@@ -34,9 +34,12 @@ def datasets():
     global DB_DIR
     dbs=[]
     for db in loadsqlites(DB_DIR).keys():
-        f=open('%s/%s.json' % (DB_DIR, db),'r')
-        dbs.append({'name': db, 'meta': json.load(f)})
-        f.close()
+        try:
+            f=open('%s/%s.json' % (DB_DIR, db),'r')
+            dbs.append({'name': db, 'meta': json.load(f)})
+            f.close()
+        except:
+            dbs.append({'name': db, 'meta': {'title': db, 'deftable': db}})
     return render_template('datasets.html', dbs=dbs)
 
 @app.route('/q/<string:db>/<path:q>', methods=['GET'])
