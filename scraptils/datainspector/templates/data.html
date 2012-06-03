@@ -17,6 +17,7 @@ body {
 .hidden { visibility: hidden; display: none; }
 
 #infobox { height: 60px; padding: 2px; clear: both; }
+#infobox p { float: left; }
 
 #grid {
   position: fixed;
@@ -69,11 +70,6 @@ body {
 {% endblock %}
 {% block main %}
 <div id="infobox">
-    <input type="text" id="groupbyfilter" />
-    <button onclick="groupBy()">Group</button>
-    <button onclick="clearGrouping()">Clear grouping</button>
-    <button onclick="collapseAllGroups()">Collapse all groups</button>
-    <button onclick="expandAllGroups()">Expand all groups</button>
    {%if meta %}
    {{meta.title}}, Author: <a href="{{meta.author.url}}">{{meta.author.title}}</a>
    Download as:
@@ -85,6 +81,13 @@ body {
       <li><a href="{{meta.source}}">Original Source</a></li>
    </ul>
    <div>{{meta.description}}</div>
+    <p>Group by:
+    <select id="groupbyselect" onchange="groupBy(this.selectedIndex)">
+      <option onclick="clearGrouping();">none</option>
+    </select>
+    <button onclick="collapseAllGroups()">Collapse all groups</button>
+    <button onclick="expandAllGroups()">Expand all groups</button>
+    </p>
    {% endif %}
 
 </div>
@@ -150,8 +153,9 @@ function filter(item) {
   return true;
 }
 
-function groupBy() {
-  var name = $('#groupbyfilter').attr('value');
+function groupBy(index) {
+  if(index == 0) { clearGrouping(); return; }
+  var name = $($('#groupbyselect option')[index]).text()
   dataView.groupBy(
       name,
       function (g) {
@@ -190,6 +194,7 @@ $(function () {
   var has_id = false;
   var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider()
   for(k in columns) {
+      $('#groupbyselect').append('<option>'+columns[k].name+'</option>');
       if(columns[k].id == 'id') {
           has_id = true;
           break;
