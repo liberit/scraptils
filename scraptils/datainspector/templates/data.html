@@ -197,7 +197,6 @@ $(function () {
       $('#groupbyselect').append('<option>'+columns[k].name+'</option>');
       if(columns[k].id == 'id') {
           has_id = true;
-          break;
       }
   }
   data = {{ data|safe }};
