@@ -31,7 +31,7 @@ disallowed_chars = re.compile('[^a-zA-Z_]', re.U)
 
 def clean(field, maxwidth=40):
     global disallowed_chars
-    return disallowed_chars.sub('_', field).lower()[:maxwidth]
+    return '_'.join(x for x in disallowed_chars.sub('_', field).lower() if x)[:maxwidth]
 
 def discover(table, data, schema=None):
     def mkstruct(): return {'_conns': []}
