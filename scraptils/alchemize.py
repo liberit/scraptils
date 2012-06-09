@@ -160,6 +160,12 @@ def argparser():
                      ,default   = sys.stdin
                      ,type      = argparse.FileType('r')
                      )
+    argp.add_argument('-t', '--input-type'
+                     ,help      = 'Input file type'
+                     ,choices   = ('json', 'csv')
+                     ,default   = 'json'
+                     ,type      = argparse.FileType('r')
+                     )
     argp.add_argument('-d', '--db'
                      ,help      = 'Database connection string - default is \'sqlite:///data.sqlite\''
                      ,default   = 'sqlite:///data.sqlite'
