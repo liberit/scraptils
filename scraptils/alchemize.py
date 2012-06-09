@@ -78,6 +78,18 @@ def parse_json(data, default_name='data'):
 
     return (name, chunk)
 
+def parse_csv(infile, default_name='data'):
+    field_names  = map(unicode.strip, infile.readline().decode('utf-8').split(','))
+    field_values = map(unicode.strip, infile.readline().decode('utf-8').split(','))
+    ret = dict(zip(field_names, field_values))
+    name = ret.get('_name')
+    if name:
+        ret.pop('_name')
+    else:
+        name = default_name
+
+    return (name, ret)
+
 def readlines(infile, outfile=None):
     l = infile.readline()
     while l:
@@ -95,7 +107,6 @@ def defcolumn(name, field_type, *args):
         field += ', ' + attrs
     field += ')'
     return field
-
 
 def assoc_table(t1, t2):
     return ['%s_%s = Table(\'%s_%s\', Base.metadata' % (t1, t2, t1, t2)
@@ -177,6 +188,9 @@ if __name__ == '__main__':
     #print parse_json(json.dumps({'_name': 'data_table', 'test_int': 6, 'test_float': 4.4, 'test_str': 'asdf', 'conn_table': {'test_bool': True}}), r)
     args = argparser()
     schema = {}
-    for line in readlines(args['input']):
-        schema = discover(*parse_json(line), schema=schema)
+    if args['input_type'] == 'json':
+        for line in readlines(args['input']):
+            schema = discover(*parse_json(line), schema=schema)
+    elif args['input_type'] == 'csv':
+        schema = discover(*parse_csv(args['input']), schema=schema)
     print createschema(schema, args['db'])
