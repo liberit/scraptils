@@ -31,7 +31,7 @@ disallowed_chars = re.compile('[^a-zA-Z_]', re.U)
 
 def clean(field, maxwidth=40):
     global disallowed_chars
-    return '_'.join(x for x in disallowed_chars.sub('_', field).lower() if x)[:maxwidth]
+    return disallowed_chars.sub('_', field).lower()[:maxwidth]
 
 def discover(table, data, schema=None):
     def mkstruct(): return {'_conns': []}
@@ -133,7 +133,7 @@ def createschema(schema, connection_string):
                    ,'    __tablename__ = \'%s\'' % table_name
                    ,'    id = Column(Integer, primary_key=True)'
                    ))
-        for field_name, field_type in attrs.items():
+        for field_name, field_type in set(attrs.items()):
             ret.append(defcolumn(field_name, field_type))
         for t1, t2 in relations:
             if t1 == table_name:
