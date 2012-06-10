@@ -19,10 +19,10 @@
 # (C) 2012 Adam Tauber <asciimoo@faszkorbacs.hu>
 
 
-import json
 import sys
 import re
 from sys import stderr
+from scraptils.io import parse_json, parse_csv, readlines
 
 pytypes  = (bool, int, float, unicode)
 sqltypes = ('Boolean', 'Integer', 'Float', 'String')
@@ -33,14 +33,17 @@ def clean(field, maxwidth=40):
     global disallowed_chars
     return disallowed_chars.sub('_', field).lower()[:maxwidth]
 
+def _mkstruct(): return {'_conns': []}
+
 def discover(table, data, schema=None):
-    def mkstruct(): return {'_conns': []}
     if not schema:
-        schema = {table: mkstruct()}
+        schema = {table: _mkstruct()}
     elif not schema.has_key(table):
-        schema[table] = mkstruct()
+        schema[table] = _mkstruct()
 
     for key, value in data.items():
+        if key == '_name':
+            continue
         key = clean(key)
         if isinstance(value, dict):
             sub = discover(key, value, schema)
@@ -59,46 +62,6 @@ def discover(table, data, schema=None):
         else:
             print >> stderr, '[!] Error - cannot handle value "%r" - %r' % (value, type(value))
     return schema
-
-def read_json(data):
-    try:
-        chunk = json.loads(data)
-    except Exception, e:
-        print >> stderr, '[E] Cannot parse %r\n   %r' % (data, e.message)
-        return {}
-    return chunk
-
-def parse_json(data, default_name='data'):
-    chunk = read_json(data)
-    name = chunk.get('_name')
-    if name:
-        chunk.pop('_name')
-    else:
-        name = default_name
-
-    return (name, chunk)
-
-def parse_csv(infile, default_name='data'):
-    field_names  = map(unicode.strip, infile.readline().decode('utf-8').split(','))
-    field_values = map(unicode.strip, infile.readline().decode('utf-8').split(','))
-    ret = dict(zip(field_names, field_values))
-    name = ret.get('_name')
-    if name:
-        ret.pop('_name')
-    else:
-        name = default_name
-
-    return (name, ret)
-
-def readlines(infile, outfile=None):
-    l = infile.readline()
-    while l:
-        yield l
-        try:
-            l = infile.readline()
-        except Exception, e:
-            print >> stderr, '[E] Error reading %s: %r' % (infile.name, e.message)
-            l = None
 
 def defcolumn(name, field_type, *args):
     attrs = ', '.join(args)
@@ -121,11 +84,11 @@ def createschema(schema, connection_string):
           ,'from sqlalchemy.ext.declarative import declarative_base'
           ,''
           ,'engine = create_engine(\'%s\')' % connection_string
-          ,'db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))'
+          ,'session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))'
           ,''
           ,'Base = declarative_base()'
           ,'Base.metadata.bind = engine'
-          ,'Base.query = db_session.query_property()'
+          ,'Base.query = session.query_property()'
           ,''
           ]
     relations = set()
