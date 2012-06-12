@@ -60,7 +60,7 @@ def insert(model, table_name, data):
 
 def argparser():
     import argparse
-    argp = argparse.ArgumentParser(description='Scraptils JSON SQLizer')
+    argp = argparse.ArgumentParser(description='Scraptils SQLAlchemy database insert script')
     argp.add_argument('-i', '--input'
                      ,help      = 'Input file - default is STDIN'
                      ,metavar   = 'FILE'
