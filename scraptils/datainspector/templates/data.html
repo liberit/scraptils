@@ -17,6 +17,7 @@ body {
 .hidden { visibility: hidden; display: none; }
 
 #infobox { height: 60px; padding: 2px; clear: both; }
+#infobox p { float: left; }
 
 #grid {
   position: fixed;
@@ -43,6 +44,18 @@ body {
 }
 
 .odd { background: #F8F8F8; }
+.slick-group-toggle {
+  width: 9px;
+  height: 9px;
+  margin-right: 5px;
+}
+.slick-group-toggle.expanded {
+  background: url(/static/images/collapse.gif) no-repeat center center;
+}
+
+.slick-group-toggle.collapsed {
+  background: url(/static/images/expand.gif) no-repeat center center;
+}
 
 </style>
 {% endblock %}
@@ -51,6 +64,7 @@ body {
 <script src="http://mleibman.github.com/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js"></script>
 <script src="http://mleibman.github.com/SlickGrid/lib/jquery.event.drag-2.0.min.js"></script>
 <script src="http://mleibman.github.com/SlickGrid/slick.dataview.js"></script>
+<script src="http://mleibman.github.com/SlickGrid/slick.groupitemmetadataprovider.js"></script>
 <script src="http://mleibman.github.com/SlickGrid/slick.core.js"></script>
 <script src="http://mleibman.github.com/SlickGrid/slick.grid.js"></script>
 {% endblock %}
@@ -58,7 +72,7 @@ body {
 <div id="infobox">
    {%if meta %}
    {{meta.title}}, Author: <a href="{{meta.author.url}}">{{meta.author.title}}</a>
-   Download as: 
+   Download as:
    <ul>
       <li><a href="/json/{{db}}{{query}}">JSON</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"><a href="http://opendatacommons.org/licenses/odbl/">{{meta.license}}</a>{%else%}{{meta.license}}{%endif%}</span>)</li>
       <li><a href="/csv/{{db}}{{query}}">CSV</a>(<span{% if meta.license=='ODBL' %} title="This database is made available under the Open Database License: http://opendatacommons.org/licenses/odbl/1.0/. Any rights in individual contents of the database are licensed under the Database Contents License: http://opendatacommons.org/licenses/dbcl/1.0/"><a href="http://opendatacommons.org/licenses/odbl/">{{meta.license}}</a>{%else%}{{meta.license}}{%endif%}</span>)</li>
@@ -67,6 +81,13 @@ body {
       <li><a href="{{meta.source}}">Original Source</a></li>
    </ul>
    <div>{{meta.description}}</div>
+    <p>Group by:
+    <select id="groupbyselect" onchange="groupBy(this.selectedIndex)">
+      <option onclick="clearGrouping();">none</option>
+    </select>
+    <button onclick="collapseAllGroups()">Collapse all groups</button>
+    <button onclick="expandAllGroups()">Expand all groups</button>
+    </p>
    {% endif %}
 
 </div>
@@ -132,12 +153,50 @@ function filter(item) {
   return true;
 }
 
+function groupBy(index) {
+  if(index == 0) { clearGrouping(); return; }
+  var name = $($('#groupbyselect option')[index]).text()
+  dataView.groupBy(
+      name,
+      function (g) {
+        return name+":  " + g.value + "  <span style='color:green'>(" + g.count + " items)</span>";
+      },
+      function (a, b) {
+        return a.value - b.value;
+      }
+  );
+  dataView.setAggregators([
+    new Slick.Data.Aggregators.Avg("percentComplete")
+  ], false);
+}
+
+function collapseAllGroups() {
+  dataView.beginUpdate();
+  for (var i = 0; i < dataView.getGroups().length; i++) {
+    dataView.collapseGroup(dataView.getGroups()[i].value);
+  }
+  dataView.endUpdate();
+}
+
+function expandAllGroups() {
+  dataView.beginUpdate();
+  for (var i = 0; i < dataView.getGroups().length; i++) {
+    dataView.expandGroup(dataView.getGroups()[i].value);
+  }
+  dataView.endUpdate();
+}
+
+function clearGrouping() {
+  dataView.groupBy(null);
+}
+
 $(function () {
   var has_id = false;
+  var groupItemMetadataProvider = new Slick.Data.GroupItemMetadataProvider()
   for(k in columns) {
+      $('#groupbyselect').append('<option>'+columns[k].name+'</option>');
       if(columns[k].id == 'id') {
           has_id = true;
-          break;
       }
   }
   data = {{ data|safe }};
@@ -147,8 +206,9 @@ $(function () {
           data[k].id = parseInt(k)+1;
       }
   }
-  dataView = new Slick.Data.DataView({ inlineFilters: true });
+  dataView = new Slick.Data.DataView({ groupItemMetadataProvider: groupItemMetadataProvider, inlineFilters: true });
   grid = new Slick.Grid("#grid", dataView, columns, options);
+  grid.registerPlugin(groupItemMetadataProvider);
 
   dataView.onRowCountChanged.subscribe(function (e, args) {
     grid.updateRowCount();
