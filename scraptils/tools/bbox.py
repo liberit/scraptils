@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # finds bounding boxes, used by pdfmask
 
-import numpy as np
 import scipy.ndimage as ndimage
 import scipy.spatial as spatial
 import scipy.misc as misc
@@ -113,7 +112,7 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    data = misc.imread(sys.argv[1])
+    data = misc.imread(sys.argv[1], flatten=True)
     im = ax.imshow(data)
     data_slices = find_paws(255-data, smooth_radius = 5, threshold = 5)
 
