@@ -1,1 +1,7 @@
 include README.markdown
+include tools/bbox.py
+include tools/csvtojson.py
+include tools/pdf2csv.py
+include tools/pdfmask.sh
+include tools/showcells.py
+include tools/split.py

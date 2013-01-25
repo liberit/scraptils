@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "scraptils",
-    version = "0.1.2",
+    version = "0.2.0",
     author = "Stefan Marsiske",
     author_email = "s@ctrlc.hu",
     description = ("Scraping and datamangling Utilities"),
