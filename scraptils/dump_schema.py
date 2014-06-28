@@ -319,8 +319,45 @@ def test_dump(fname, html_only=False):
     else:
         dump_schema(elements,title='lobbyregister',format='text')
 
+
+def argparser():
+    import argparse
+    argp = argparse.ArgumentParser(description='Scraptils data schema analyzer')
+    argp.add_argument('-i', '--input'
+                     ,help      = 'Input file - default is STDIN'
+                     ,metavar   = 'FILE'
+                     ,default   = sys.stdin
+                     ,type      = argparse.FileType('r')
+                     )
+    argp.add_argument('-l', '--limit'
+                     ,help      = 'Limit the number of input lines'
+                     ,default   = 0
+                     ,type      = int
+                     )
+    argp.add_argument('-f', '--format'
+                     ,help      = 'Output type'
+                     ,choices   = ('text', 'html', 'full-html')
+                     ,default   = 'text'
+                     )
+    return vars(argp.parse_args())
+
+
 if __name__ == "__main__":
     #test_diff()
     from json import loads
-    from sys import argv
-    dump_schema(loads(raw_input()), format='text')
+    args = argparser()
+    d = []
+    lineno = 0
+    while True:
+        if args['limit'] > 0 and args['limit'] <= lineno:
+            break
+
+        line = args['input'].readline()
+
+        if not line:
+            break
+
+        d.append(loads(line.strip()))
+        lineno += 1
+
+    dump_schema(d, format=args['format'])
