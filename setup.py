@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = "scraptils",
-    version = "0.2.1",
+    version = "0.2.2",
     author = "Stefan Marsiske",
     author_email = "s@ctrlc.hu",
     description = ("Scraping and datamangling Utilities"),
@@ -19,6 +19,9 @@ setup(
     packages = find_packages(),
     url = "http://packages.python.org/scraptils",
     py_modules=['scraptils' ],
+    entry_points={
+        "console_scripts": ["dump_schema=scraptils.dump_schema:__main__"]
+    },
     long_description=read('README.markdown'),
     classifiers = ["Development Status :: 4 - Beta",
                    "License :: OSI Approved :: GNU Affero General Public License v3",
